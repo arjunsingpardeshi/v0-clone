@@ -14,8 +14,8 @@ export default function Home() {
   //     runOnboarding();  
   // }, []);
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <Button className="bg-amber-600 hover:bg-amber-500">click me</Button>
+    <div className="flex min-h-screen items-center justify-center ">
+      <Button className="">click me</Button>
       <UserButton/>
     </div>
   );
