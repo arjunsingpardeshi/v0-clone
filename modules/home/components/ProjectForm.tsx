@@ -5,7 +5,7 @@ import TextAreaAutosize from "react-textarea-autosize";
 import { ArrowUpIcon, Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import z from "zod";
 
 import { cn } from "@/lib/utils";
@@ -70,7 +70,7 @@ const PROJECT_TEMPLATES = [
   }
 ];
 const ProjectForm = () => {
-  
+  const [shuffledTemplates] = useState(() => shuffle(PROJECT_TEMPLATES))
   const [isFocused, setIsFocused]  = useState(false)
   const router = useRouter()
   
@@ -92,11 +92,20 @@ const ProjectForm = () => {
         
     }
   }
+  function shuffle<T>(array: T[]) {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
   return (
     <div className="space-y-8">
         {/* Templates Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {PROJECT_TEMPLATES.map((template, index) => (
+            {shuffledTemplates.map((template, index) => (
           <button
             key={index}
             onClick={() => handleTemplate(template.prompt)}
