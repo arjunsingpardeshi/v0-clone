@@ -2,16 +2,18 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TextAreaAutosize from "react-textarea-autosize";
-import { ArrowUpIcon, Loader2Icon } from "lucide-react";
+import { ArrowUpIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import z from "zod";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
 import { invoke } from "../action";
+import { useCreateProject } from "@/modules/projects/hooks/project";
+import { Spinner } from "@/components/ui/spinner";
 
 const formSchema = z.object({
     content: z
@@ -74,12 +76,14 @@ const ProjectForm = () => {
   const [shuffledTemplates] = useState(() => shuffle(PROJECT_TEMPLATES))
   const [isFocused, setIsFocused]  = useState(false)
   const router = useRouter()
-  
+  const {mutateAsync, isPending} = useCreateProject()
   const form = useForm({
     resolver:zodResolver(formSchema),
     defaultValues:{
         content: ""
-    }
+    },
+    mode: "onChange"
+
   })
 
   const handleTemplate = (prompt: string) => {
@@ -88,9 +92,15 @@ const ProjectForm = () => {
 
   const onSubmit: SubmitHandler<{ content: string }> = async(values) => {
     try {
-        console.log(values)
+        const res = await mutateAsync(values.content)
+        router.push(`/projects/${res.id}`)
+        toast.success("Project created successfully")
+        form.reset()
     } catch (error) {
-        
+        if(error instanceof Error){
+          toast.error(error.message || "Failed to create project")
+        }
+        toast.error("Failed to create project")
     }
   }
   function shuffle<T>(array: T[]) {
@@ -102,21 +112,10 @@ const ProjectForm = () => {
   return result;
 }
 
-const invokeAI = async() => {
-    try {
-      const res = await invoke()
-      console.log(res)
-      toast.success("done")
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
+const isButtonDisabled = isPending || !form.watch("content").trim()
   return (
     <div className="space-y-8">
-      <Button  onClick={invokeAI}>
-        Invoke AI agent
-      </Button>
         {/* Templates Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {shuffledTemplates.map((template, index) => (
@@ -193,16 +192,16 @@ const invokeAI = async() => {
             <Button
               className={cn(
                 "size-8 rounded-full",
-              //  isButtonDisabled && "bg-muted-foreground border"
+                isButtonDisabled && "bg-muted-foreground border"
               )}
-             // disabled={isButtonDisabled}
+              disabled={isButtonDisabled}
               type="submit"
             >
-              {/* {isPending ? (
-                <Loader2Icon className="size-4 animate-spin" />
+              {isPending ? (
+                <Spinner className="size-4 animate-spin" />
               ) : (
                 <ArrowUpIcon className="size-4" />
-              )} */}
+              )}
             </Button>
           </div>
         </form>

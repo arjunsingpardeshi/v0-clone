@@ -1,4 +1,4 @@
-import { AgentResult ,TextMessage} from "@inngest/agent-kit";
+import { AgentResult} from "@inngest/agent-kit";
 
 export function lastAssistantTextMessageContent(result:AgentResult){
     const lastAssistantTextMessageIndex = result.output.findLastIndex(
@@ -8,5 +8,5 @@ export function lastAssistantTextMessageContent(result:AgentResult){
     const message = result.output[lastAssistantTextMessageIndex] 
 
 
-    return message?.content ? typeof message.content === "string" ? message.content : message.content.map((c)=>c.text).join("") : undefined
+    return message?.content ? (typeof message.content === "string" ? message.content : message.content.map((c)=>c.text).join("")) : undefined
 }

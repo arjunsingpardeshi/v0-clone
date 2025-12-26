@@ -5,6 +5,8 @@ import z from "zod";
 import path from "path";
 import { PROMPT } from "@/utils/prompt";
 import { lastAssistantTextMessageContent } from "./utils";
+import db from "@/lib/db";
+import { MessageRole, MessageType } from "@/lib/generated/prisma/enums";
 
 export const codeAgentFunction = inngest.createFunction(
   { id: "code-agent" },
@@ -151,6 +153,41 @@ export const codeAgentFunction = inngest.createFunction(
       return `http://${host}`
     })
 
+
+    await step.run("save-result", async () => {
+      try {
+        if (isError) {
+          return await db.message.create({
+            data: {
+              projectId: event.data.projectId,
+              content: "Something went wrong. try again",
+              role: MessageRole.ASSISTANT,
+              type: MessageType.ERROR
+            }
+          })
+        }
+        return await db.message.create({
+          data: {
+            projectId: event.data.projectId,
+            content: result.state.data.summary,
+            role: MessageRole.ASSISTANT,
+            type: MessageType.RESULT,
+            fragments: {
+              create: {
+                sandboxUrl: sandboxUrl,
+                title: "Untitle",
+                files: result.state.data.files
+              }
+            }
+          }
+        })
+      } catch (error) {
+        if(error instanceof Error){
+         return error.message
+        }
+        return error
+      }   
+     })
     return{
       url: sandboxUrl,
       title: "Untitle",
