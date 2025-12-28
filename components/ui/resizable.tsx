@@ -7,17 +7,19 @@ type ResizablePanelGroupProps = {
   direction?: "horizontal" | "vertical"
   className?: string
   children: React.ReactNode
+  defaultSizes?: number[]  
 }
 
 export function ResizablePanelGroup({
   direction = "horizontal",
   className,
   children,
+  defaultSizes,
 }: ResizablePanelGroupProps) {
   return (
     <Allotment
-      direction={direction}
-      className={cn("h-full w-full", className)}
+      defaultSizes={defaultSizes} 
+      className={cn("h-screen w-full", className)}
     >
       {children}
     </Allotment>
@@ -25,21 +27,18 @@ export function ResizablePanelGroup({
 }
 
 type ResizablePanelProps = {
-  defaultSize?: number
   minSize?: number
   className?: string
   children?: React.ReactNode
 }
 
 export function ResizablePanel({
-  defaultSize,
   minSize,
   className,
   children,
 }: ResizablePanelProps) {
   return (
     <Allotment.Pane
-      preferredSize={defaultSize}
       minSize={minSize}
       className={cn("min-h-0 min-w-0", className)}
     >

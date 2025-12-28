@@ -1,0 +1,106 @@
+import { MessageContainerProps } from '@/types/interface'
+import {
+    useGetMessages,
+    prefetchMessages,
+} from "@/modules/messages/hooks/message";
+import React, { useEffect, useRef } from "react";
+import { useQueryClient } from '@tanstack/react-query';
+import { Spinner } from '@/components/ui/spinner';
+import MessageCard from './MessageCard';
+import { MessageRole } from '@/lib/generated/prisma/enums';
+import MessageForm from './MessageForm';
+import MessageLoading from './MessageLoading';
+
+const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: MessageContainerProps) => {
+
+    const queryClient = useQueryClient()
+    const bottomRef = useRef(null)
+    const lastAssistanceMessageIdRef = useRef(null)
+
+    const { data: messages, isPending, isError, error } = useGetMessages(projectId)
+
+    useEffect(() => {
+        if (projectId) {
+            prefetchMessages(queryClient, projectId)
+        }
+    }, [projectId, queryClient])
+
+    
+    useEffect(() => {
+
+        const lastAssistantMessage = messages?.findLast((message) => message.role === MessageRole.ASSISTANT)
+
+        if(lastAssistantMessage?.fragments && lastAssistantMessage.id !== lastAssistanceMessageIdRef.current){
+            
+            setActiveFragment(lastAssistantMessage?.fragments);
+            lastAssistanceMessageIdRef.current = lastAssistantMessage.id
+        }
+    }, [messages, setActiveFragment])
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({behaviour: "smooth"})
+    }, [messages?.length])
+    if (isPending) {
+        return (
+            <div className='flex items-center justify-center h-full'>
+                <Spinner className={"text-amber-400"} />
+            </div>
+        )
+    }
+    if (isError) {
+        return (
+            <div className="flex items-center justify-center h-full text-red-500">
+                Error: {error.message || "Falied to load messages"}
+            </div>
+        )
+    }
+
+    if (messages || messages.length === 0) {
+        return (
+
+
+            <div className='flex flex-col flex-1 min-h-0'>
+                <div className='flex-1 flex items-center justify-center text-muted-foreground'>
+                    No message yet. Start conversation
+                </div>
+                <div className='relative p-3 pt-1'>
+                    <div className='absolute -top-6 left-0 right-0 h-6 bg-linear-to-b from-transparent to-background pointer-events-none'>
+                        <MessageForm projectId={projectId}/>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    
+
+    
+    const lastMessage = messages[messages.length-1]
+    const isLastMessageUser = lastMessage.role === MessageRole.USER
+    return (
+        <div className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 min-h-0 overflow-y-auto">
+                <div className="pt-2 pr-1">
+                    {messages.map((message) => (
+                        <MessageCard
+                            key={message.id}
+                            content={message.content}
+                            role={message.role}
+                            fragment={message.fragments}
+                            createdAt={message.createdAt}
+                            isActiveFragment={activeFragment?.id === message.fragments?.id}
+                            onFragmentClick={() => setActiveFragment(message.fragments)}
+                            type={message.type}
+                        />
+                    ))}
+                    {isLastMessageUser && <MessageLoading/>}
+                    <div ref={bottomRef} />
+                </div>
+            </div>
+            <div className="relative p-3 pt-1">
+                <div className="absolute -top-6 left-0 right-0 h-6 bg-linear-to-b from-transparent to-background pointer-events-none" />
+                <MessageForm projectId={projectId} />
+            </div>
+        </div>
+    )
+}
+
+export default MessageContainer
