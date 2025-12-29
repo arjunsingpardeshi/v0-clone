@@ -15,7 +15,7 @@ const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: Mess
 
     const queryClient = useQueryClient()
     const bottomRef = useRef(null)
-    const lastAssistanceMessageIdRef = useRef(null)
+    const lastAssistantMessageIdRef = useRef(null)
 
     const { data: messages, isPending, isError, error } = useGetMessages(projectId)
 
@@ -28,17 +28,19 @@ const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: Mess
     
     useEffect(() => {
 
-        const lastAssistantMessage = messages?.findLast((message) => message.role === MessageRole.ASSISTANT)
+    const lastAssistantMessage = messages?.findLast((message) => message.role === MessageRole.ASSISTANT)
 
-        if(lastAssistantMessage?.fragments && lastAssistantMessage.id !== lastAssistanceMessageIdRef.current){
+        if(lastAssistantMessage?.fragments && lastAssistantMessage.id !== lastAssistantMessageIdRef.current){
             
             setActiveFragment(lastAssistantMessage?.fragments);
-            lastAssistanceMessageIdRef.current = lastAssistantMessage.id
+            lastAssistantMessageIdRef.current = lastAssistantMessage.id
         }
     }, [messages, setActiveFragment])
+
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({behaviour: "smooth"})
+        bottomRef.current?.scrollIntoView({behavior: "smooth"})
     }, [messages?.length])
+
     if (isPending) {
         return (
             <div className='flex items-center justify-center h-full'>
@@ -49,12 +51,12 @@ const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: Mess
     if (isError) {
         return (
             <div className="flex items-center justify-center h-full text-red-500">
-                Error: {error.message || "Falied to load messages"}
+                Error: {error.message || "Failed to load messages"}
             </div>
         )
     }
 
-    if (messages || messages.length === 0) {
+    if (!messages || messages.length === 0) {
         return (
 
 
@@ -63,9 +65,9 @@ const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: Mess
                     No message yet. Start conversation
                 </div>
                 <div className='relative p-3 pt-1'>
-                    <div className='absolute -top-6 left-0 right-0 h-6 bg-linear-to-b from-transparent to-background pointer-events-none'>
+                    <div className='absolute -top-6 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-background pointer-events-none' />
                         <MessageForm projectId={projectId}/>
-                    </div>
+                    
                 </div>
             </div>
         )
@@ -96,7 +98,7 @@ const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: Mess
                 </div>
             </div>
             <div className="relative p-3 pt-1">
-                <div className="absolute -top-6 left-0 right-0 h-6 bg-linear-to-b from-transparent to-background pointer-events-none" />
+                <div className="absolute -top-6 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-background pointer-events-none" />
                 <MessageForm projectId={projectId} />
             </div>
         </div>
