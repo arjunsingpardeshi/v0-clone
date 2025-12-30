@@ -65,7 +65,7 @@ const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: Mess
                     No message yet. Start conversation
                 </div>
                 <div className='relative p-3 pt-1'>
-                    <div className='absolute -top-6 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-background pointer-events-none' />
+                    <div className='absolute -top-6 left-0 right-0 h-6 bg-linear-to-b from-transparent to-background pointer-events-none' />
                         <MessageForm projectId={projectId}/>
                     
                 </div>
@@ -98,7 +98,7 @@ const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: Mess
                 </div>
             </div>
             <div className="relative p-3 pt-1">
-                <div className="absolute -top-6 left-0 right-0 h-6 bg-gradient-to-b from-transparent to-background pointer-events-none" />
+                <div className="absolute -top-6 left-0 right-0 h-6 bg-linear-to-b from-transparent to-background pointer-events-none" />
                 <MessageForm projectId={projectId} />
             </div>
         </div>

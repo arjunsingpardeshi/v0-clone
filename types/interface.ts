@@ -1,4 +1,5 @@
 import type{ Fragment } from "@/lib/generated/prisma/client";
+import type { Prisma } from '@/lib/generated/prisma/client'
 
 export interface Props  {
   children: React.ReactNode;
@@ -50,3 +51,4 @@ export interface FragmentCardProps
   isActiveFragment: boolean;
   onFragmentClick:(fragment:Fragment) => void;
 }
+

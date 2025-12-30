@@ -14,13 +14,15 @@ import MessageContainer from "./MessageContainer";
 import { Fragment } from "@/lib/generated/prisma/client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import FragmentWeb from "./FragmentWeb";
+import FileExplorer from "./FileExplorer";
 
 const ProjectView = ({ projectId }: { projectId: string }) => {
   const [activeFragment, setActiveFragment] = useState<Fragment | null>(null)
   const [tabState, setTabState] = useState("preview")
   return (
     <div className="h-screen">
-      <ResizablePanelGroup defaultSizes={[300, 800]}>
+      <ResizablePanelGroup defaultSizes={[300, 800]} className="h-full">
         <ResizablePanel
           minSize={200}
           className="flex flex-col min-h-0 h-full overflow-hidden"
@@ -32,7 +34,7 @@ const ProjectView = ({ projectId }: { projectId: string }) => {
             setActiveFragment={setActiveFragment}
           />
         </ResizablePanel>
-        <ResizablePanel minSize={400}>
+        <ResizablePanel minSize={400} className="flex flex-col h-full min-h-0 overflow-hidden">
           <Tabs
             className="h-full flex flex-col"
             defaultValue="preview"
@@ -65,11 +67,29 @@ const ProjectView = ({ projectId }: { projectId: string }) => {
                 </Button>
               </div>
             </div>
-            <TabsContent value="preview">
-
+            <TabsContent 
+            value="preview"
+            className="flex flex-col flex-1 min-h-0 overflow-hidden"
+            >
+              {
+                activeFragment 
+                ? (<><FragmentWeb data = {activeFragment}/></>) 
+                : (<div className=" flex items-center justify-center h-full text-muted-foreground">
+                  Select a fragmnet to preview
+                </div>)
+              }
             </TabsContent>
-            <TabsContent value="code">
-
+            <TabsContent 
+            className="flex-1 h-[calc(100%-4rem)] overflow-hidden"
+            value="code"
+            >
+              {
+                activeFragment?.files 
+                ? (<FileExplorer files = {activeFragment.files}/>) 
+                : (<div className= "flex items-center justify-center h-full text-muted-foreground">
+                  Select Fragment to view code
+                </div>)
+              }
             </TabsContent>
           </Tabs>
         </ResizablePanel>
