@@ -1,23 +1,41 @@
 "use server"
 
-import { inngest } from "@/inngest/client" 
+import { inngest } from "@/inngest/client"
 import db from "@/lib/db"
-import {MessageRole, MessageType} from "@/lib/generated/prisma/client" 
+import { MessageRole, MessageType } from "@/lib/generated/prisma/client"
+import { consumeCredits } from "@/lib/usage"
 import { getCurrentUser } from "@/modules/auth/actions"
-import {generateSlug} from "random-word-slugs"
+import { generateSlug } from "random-word-slugs"
 
-export async function createProject(value: string){
+export async function createProject(value: string) {
 
     try {
-        const user = await getCurrentUser();    
+        const user = await getCurrentUser();
 
-        if(!user){
+        if (!user) {
             throw new Error("Unauthorized");
+        }
+
+
+        try {
+
+            await consumeCredits();
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new Error("Somthing went wrong", {
+                    cause: { code: "BAD_REQUEST" }
+                })
+            }
+            else {
+                throw new Error("To many request", {
+                    cause: { code: "TOO_MANY_REQUESTS" }
+                })
+            }
         }
 
         const newProject = await db.project.create({
             data: {
-                name: generateSlug(2, {format:"kebab"}),
+                name: generateSlug(2, { format: "kebab" }),
                 userId: user.id,
                 messages: {
                     create: {
@@ -29,7 +47,7 @@ export async function createProject(value: string){
             }
         });
 
-        
+
         await inngest.send({
             name: "code-agent/run",
             data: {
@@ -40,18 +58,18 @@ export async function createProject(value: string){
         return newProject;
 
     } catch (error) {
-    if(error instanceof Error){
-         return error.message
-    }
-    return error
+        if (error instanceof Error) {
+            return error.message
+        }
+        return error
     }
 }
 
-export async function getProjects(){
+export async function getProjects() {
     try {
         const user = await getCurrentUser();
-        
-        if(!user){
+
+        if (!user) {
             throw new Error("Unauthorize")
         }
 
@@ -65,18 +83,18 @@ export async function getProjects(){
         });
         return projects
     } catch (error) {
-        if(error instanceof Error){
-             return error.message
+        if (error instanceof Error) {
+            return error.message
         }
         return error
-    }   
+    }
 }
 
-export async function getProjectById(projectId:string) {
+export async function getProjectById(projectId: string) {
     try {
-        
+
         const user = await getCurrentUser();
-    
+
         if (!user) {
             throw new Error("Unauthorize")
         }
@@ -87,16 +105,16 @@ export async function getProjectById(projectId:string) {
             }
         });
 
-        if(!project)throw new   Error("Project not found");
+        if (!project) throw new Error("Project not found");
 
         return project;
 
     } catch (error) {
-        if(error instanceof Error){
-         return error.message
+        if (error instanceof Error) {
+            return error.message
         }
         return error
-    
+
     }
 
 }
