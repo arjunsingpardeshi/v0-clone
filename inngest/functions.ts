@@ -1,5 +1,5 @@
 import { inngest } from "./client";
-import { gemini, createAgent, createTool, createNetwork } from "@inngest/agent-kit";
+import { gemini, createAgent, createTool, createNetwork, createState } from "@inngest/agent-kit";
 import Sandbox from "@e2b/code-interpreter"
 import z from "zod";
 import path from "path";
@@ -7,6 +7,7 @@ import { FRAGMENT_TITLE_PROMPT, PROMPT, RESPONSE_PROMPT } from "@/utils/prompt";
 import { lastAssistantTextMessageContent } from "./utils";
 import db from "@/lib/db";
 import { MessageRole, MessageType } from "@/lib/generated/prisma/enums";
+import type { Message as AgentMessage } from "@inngest/agent-kit";
 
 export const codeAgentFunction = inngest.createFunction(
   { id: "code-agent" },
@@ -18,6 +19,40 @@ export const codeAgentFunction = inngest.createFunction(
       return sandbox.sandboxId
     })
 
+
+    const previousMessages = await step.run("get-previous-messages", async () => {
+      const formatedMessages: AgentMessage[] = []
+      try {
+        const messages = await db.message.findMany({
+          where: {
+            projectId: event.data.projectId
+          },
+          orderBy: {
+            createdAt: "desc"
+          }
+        })
+
+        for (const message of messages ){
+          formatedMessages.push({
+            type: "text",
+            role: message.role === "ASSISTANT" ? "assistant" : "user",
+            content: message.content
+          })
+        }
+        return formatedMessages
+      } catch (error) {
+        throw new Error("error in getting previous message")
+      }
+    })
+
+
+    const state =  createState({
+      summary: "",
+      files: {}
+    },
+  {
+    messages: previousMessages
+  })
     const codeAgent = createAgent({
     name:'code-agent',
     description: 'An expert coding agent',
@@ -145,7 +180,7 @@ export const codeAgentFunction = inngest.createFunction(
       }
     })
 
-    const result = await network.run(event.data.value);
+    const result = await network.run(event.data.value, {state});
 
     
     const fragmentTitleGenerator = createAgent({

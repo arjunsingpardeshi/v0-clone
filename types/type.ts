@@ -1,4 +1,4 @@
-export type Message = {
+export type DbMessage = {
   id: string
   content: string
   role: "USER" | "ASSISTANT"
