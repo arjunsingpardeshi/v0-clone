@@ -1,6 +1,6 @@
 import type { Prisma } from '@/lib/generated/prisma/client'
 import { CopyCheckIcon, CopyIcon } from "lucide-react";
-import { useState, useMemo, useCallback, Fragment } from "react";
+import { useState, useMemo, useCallback, Fragment, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ResizablePanel,
@@ -19,8 +19,11 @@ import { Hint } from '@/components/ui/hint';
 import { convertFilesToTreeItems } from '@/lib/utils';
 import { TreeView } from './TreeView';
 import { CodeView } from './code-view';
+import { FileMap } from '@/types/type';
 
-const FileBreadcrumb = ({ filePath }) => {
+
+
+const FileBreadcrumb = ({ filePath }: { filePath: string }) => {
   const pathSegments = filePath.split("/");
   const maxSegments = 4;
 
@@ -71,10 +74,11 @@ const FileBreadcrumb = ({ filePath }) => {
   );
 };
 
-function getLanguageFromExtension(filename) {
+function getLanguageFromExtension(filename: string): string {
   const extension = filename.split(".").pop()?.toLowerCase();
+  if (!extension) return "text"
 
-  const languageMap = {
+  const languageMap: Record<string, string> = {
     js: "javascript",
     jsx: "jsx",
     ts: "typescript",
@@ -86,53 +90,78 @@ function getLanguageFromExtension(filename) {
     md: "markdown",
   };
 
-  return languageMap[extension] || "text";
+
+  return languageMap[extension] ?? "text";
 }
 
-const FileExplorer = ({files}: {files: Prisma.JsonValue}) => {
+const FileExplorer = ({ files }: { files: Prisma.JsonValue }) => {
 
-    const [copied, setCopied] = useState(false);
-   const [selectedFile, setSelectedFile] = useState<string | null>(() => {
+  const [copied, setCopied] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+
+
+  //Narrow Prisma.JsonValue ONCE
+  const fileMap = useMemo<FileMap | null>(() => {
     if (files && typeof files === "object" && !Array.isArray(files)) {
-    const fileKeys = Object.keys(files)
-    return fileKeys.length > 0 ? fileKeys[0] : null
-  }
-  return null
-})
+      return files as FileMap;
+    }
+    return null;
+  }, [files]);
 
 
-const treeData = useMemo(() => {
-    return convertFilesToTreeItems(files)
-}, [files])
+  //Initialize selected file safely (moved from useState init)
+  useEffect(() => {
+    if (!selectedFile && fileMap) {
+      const firstKey = Object.keys(fileMap)[0];
+      if (firstKey) {
+        setSelectedFile(firstKey);
+      }
+    }
+  }, [fileMap, selectedFile]);
 
-const handleFileSelect = useCallback(
-    (filePath) => {
-      if (files[filePath]) {
+
+  const treeData = useMemo(() => {
+    return convertFilesToTreeItems(files);
+  }, [files]);
+
+
+  // File select handler (uses fileMap)
+  const handleFileSelect = useCallback(
+    (filePath: string) => {
+      if (fileMap?.[filePath]) {
         setSelectedFile(filePath);
       }
     },
-    [files]
-);
+    [fileMap]
+  );
 
-const handleCopy = useCallback(() => {
-    if (selectedFile && files[selectedFile]) {
-      navigator.clipboard
-        .writeText(files[selectedFile])
-        .then(() => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        })
-        .catch((error) => {
-          console.error("Failed to copy:", error);
-        });
-    }
-  }, [selectedFile, files]);
+  const handleCopy = useCallback(() => {
+    if (!selectedFile || !fileMap) return;
 
-   return (
+    const content = fileMap[selectedFile];
+    if (!content) return;
+
+    const text =
+      typeof content === "string"
+        ? content
+        : JSON.stringify(content, null, 2);
+
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch((error) => {
+        console.error("Failed to copy:", error);
+      });
+  }, [selectedFile, fileMap]);
+
+  return (
     <ResizablePanelGroup defaultSizes={[300, 800]} className="h-full">
       <ResizablePanel
         minSize={200}
-        className="bg-sidebar "
+        className="bg-sidebar flex flex-col min-h-0 h-full overflow-hidden"
       >
         <div className="h-full overflow-auto">
           <TreeView
@@ -143,12 +172,12 @@ const handleCopy = useCallback(() => {
         </div>
       </ResizablePanel>
 
-      <ResizablePanel  minSize={400}>
-        {selectedFile && files[selectedFile] ? (
+      <ResizablePanel minSize={400} className="flex flex-col min-h-0 h-full overflow-hidden">
+        {selectedFile && fileMap?.[selectedFile] ? (
           <div className="h-full w-full flex flex-col">
             <div className="border-b bg-sidebar/50 px-4 py-2 flex justify-between items-center gap-x-2">
               <FileBreadcrumb filePath={selectedFile} />
-              <Hint label="Copy to clipboard" side="bottom" sideOffset={4}>
+              <Hint text="Copy to clipboard" side="bottom" sideOffset={4}>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -163,9 +192,10 @@ const handleCopy = useCallback(() => {
                 </Button>
               </Hint>
             </div>
+
             <div className="flex-1 overflow-auto relative">
               <CodeView
-                code={files[selectedFile]}
+                code={fileMap[selectedFile]}
                 lang={getLanguageFromExtension(selectedFile)}
               />
             </div>
@@ -178,6 +208,6 @@ const handleCopy = useCallback(() => {
       </ResizablePanel>
     </ResizablePanelGroup>
   );
-}
+};
 
-export default FileExplorer
+export default FileExplorer;

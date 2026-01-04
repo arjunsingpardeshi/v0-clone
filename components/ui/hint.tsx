@@ -6,8 +6,9 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import { HintProps } from "@/types/interface";
 
-export const Hint = ({ children, text, side, align }) => {
+export const Hint = ({ children, text, side, align }: HintProps) => {
   return (
     <TooltipProvider>
       <Tooltip>

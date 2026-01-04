@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import type { Prisma } from "./generated/prisma/client";
+import { TreeItem, TreeNode } from "@/types/type";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -18,65 +19,52 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function convertFilesToTreeItems(
   files: Prisma.JsonValue
-) {
-  
+): TreeItem[] {
+  // ✅ typed tree
+  const tree: TreeNode = {};
 
-  // Build a tree structure first
-  const tree = {};
-  // Sort files to ensure consistent ordering
- // const sortedPaths = Object.keys(files).sort();
   const sortedPaths = (() => {
     if (files && typeof files === "object" && !Array.isArray(files)) {
-      return Object.keys(files).sort()
+      return Object.keys(files).sort();
     }
-    return []
-  })()
+    return [];
+  })();
 
   for (const filePath of sortedPaths) {
     const parts = filePath.split("/");
-    let current = tree;
+    let current: TreeNode = tree;
 
-    // Navigate/create the tree structure
     for (let i = 0; i < parts.length - 1; i++) {
       const part = parts[i];
       if (!current[part]) {
         current[part] = {};
       }
-      current = current[part];
+      current = current[part] as TreeNode;
     }
 
-    // Add the file (leaf node)
     const fileName = parts[parts.length - 1];
-    current[fileName] = null; // null indicates it's a file
+    current[fileName] = null;
   }
 
-  // Convert tree structure to TreeItem format
-  function convertNode(node, name) {
-    const entries = Object.entries(node);
+  // ✅ typed recursive function
+  function convertNode(node: TreeNode): TreeItem[] {
+  const entries = Object.entries(node);
+  const result: TreeItem[] = [];
 
-    if (entries.length === 0) {
-      return name || "";
+  for (const [key, value] of entries) {
+    if (value === null) {
+      // file
+      result.push(key);
+    } else {
+      // folder
+      const children = convertNode(value);
+      result.push([key, ...children]);
     }
-
-    const children = [];
-
-    for (const [key, value] of entries) {
-      if (value === null) {
-        // It's a file
-        children.push(key);
-      } else {
-        // It's a folder
-        const subTree = convertNode(value, key);
-        if (Array.isArray(subTree)) {
-          children.push([key, ...subTree]);
-        } else {
-          children.push([key, subTree]);
-        }
-      }
-    }
-
-    return children;
   }
+
+  return result;
+}
+
 
   const result = convertNode(tree);
   return Array.isArray(result) ? result : [result];

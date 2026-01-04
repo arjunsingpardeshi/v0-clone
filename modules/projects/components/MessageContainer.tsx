@@ -14,8 +14,8 @@ import MessageLoading from './MessageLoading';
 const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: MessageContainerProps) => {
 
     const queryClient = useQueryClient()
-    const bottomRef = useRef(null)
-    const lastAssistantMessageIdRef = useRef(null)
+    const bottomRef = useRef<HTMLDivElement | null>(null)
+    const lastAssistantMessageIdRef = useRef<string | null>(null)
 
     const { data: messages, isPending, isError, error } = useGetMessages(projectId)
 

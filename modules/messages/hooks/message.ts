@@ -16,8 +16,8 @@ export const useGetMessages = (projectId: string)=>{
         queryKey: ["messages", projectId],
         queryFn: ()=> getMessages(projectId),
         staleTime: 10000,
-        refetchInterval: (data) => {
-            return data?.length ? 5000 : false
+        refetchInterval: (query) => {
+            return query.state.data?.length ? 5000 : false
         }
     })
 }

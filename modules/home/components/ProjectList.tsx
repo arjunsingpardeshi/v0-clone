@@ -20,7 +20,7 @@ const ProjectList = () => {
 
 
     const {data: projects, isPending} = useGetProjects()
-    const formatDate = (date: string) => {
+    const formatDate = (date: string | Date) => {
         return new Date(date).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",

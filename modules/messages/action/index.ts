@@ -55,9 +55,9 @@ export async function createMessage(value: string, projectId: string) {
         return newMessage
     } catch (error) {
         if (error instanceof Error) {
-            return error.message || "Error in creating message"
+            throw new  Error(error.message)
         }
-        return error
+        throw error
     }
 }
 
@@ -95,8 +95,8 @@ export async function getMessages(projectId: string) {
 
     } catch (error) {
         if (error instanceof Error) {
-            return error.message || "Error in creating message"
+            throw new Error(error.message)
         }
-        return error
+        throw error
     }
 }

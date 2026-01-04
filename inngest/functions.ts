@@ -1,8 +1,7 @@
 import { inngest } from "./client";
-import { gemini, createAgent, createTool, createNetwork, createState } from "@inngest/agent-kit";
+import { openai, createAgent, createTool, createNetwork, createState } from "@inngest/agent-kit";
 import Sandbox from "@e2b/code-interpreter"
 import z from "zod";
-import path from "path";
 import { FRAGMENT_TITLE_PROMPT, PROMPT, RESPONSE_PROMPT } from "@/utils/prompt";
 import { lastAssistantTextMessageContent } from "./utils";
 import db from "@/lib/db";
@@ -18,7 +17,6 @@ export const codeAgentFunction = inngest.createFunction(
       const sandbox = await Sandbox.create("v0-clone-nextjs-002")
       return sandbox.sandboxId
     })
-
 
     const previousMessages = await step.run("get-previous-messages", async () => {
       const formatedMessages: AgentMessage[] = []
@@ -45,7 +43,6 @@ export const codeAgentFunction = inngest.createFunction(
       }
     })
 
-
     const state =  createState({
       summary: "",
       files: {}
@@ -57,7 +54,7 @@ export const codeAgentFunction = inngest.createFunction(
     name:'code-agent',
     description: 'An expert coding agent',
     system: PROMPT,
-    model: gemini({model: 'gemini-2.5-flash'}),
+    model: openai({model: 'gpt-5-mini'}),
     tools: [
       //1.Terminal
       createTool({
@@ -169,7 +166,7 @@ export const codeAgentFunction = inngest.createFunction(
       name:"coding-agent-network",
       agents: [codeAgent],
       maxIter: 10,
-
+      defaultState: state,
       router: async ({network}) => {
         const summary = network.state.data.summary;
 
@@ -182,19 +179,18 @@ export const codeAgentFunction = inngest.createFunction(
 
     const result = await network.run(event.data.value, {state});
 
-    
     const fragmentTitleGenerator = createAgent({
       name: "fragment-title-generator",
       description: "Generate a title for the fragment",
       system: FRAGMENT_TITLE_PROMPT,
-      model: gemini({model: "gemini-2.5-flash"})
+      model: openai({model: "gpt-5-nano"})
     })
 
     const responseGenerator = createAgent({
       name: "response-generator",
       description: "Generate response for the fragment",
       system: RESPONSE_PROMPT,
-      model: gemini({model:"gemini-2.5-flash"})
+      model: openai({model:"gpt-5-nano"})
     })
     const {output: fragmentTitleOutput} = await fragmentTitleGenerator.run(result.state.data.summary)
 
@@ -262,9 +258,9 @@ const generateResponse = () => {
         })
       } catch (error) {
         if(error instanceof Error){
-         return error.message
+         throw new Error(error.message)
         }
-        return error
+        throw new Error("Error "+error)
       }   
      })
     return{

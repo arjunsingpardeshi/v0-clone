@@ -16,7 +16,6 @@ export async function createProject(value: string) {
             throw new Error("Unauthorized");
         }
 
-
         try {
 
             await consumeCredits();
@@ -59,9 +58,9 @@ export async function createProject(value: string) {
 
     } catch (error) {
         if (error instanceof Error) {
-            return error.message
+            throw error.message
         }
-        return error
+        throw error
     }
 }
 
@@ -84,9 +83,9 @@ export async function getProjects() {
         return projects
     } catch (error) {
         if (error instanceof Error) {
-            return error.message
+            throw error.message
         }
-        return error
+        throw error
     }
 }
 
@@ -111,9 +110,9 @@ export async function getProjectById(projectId: string) {
 
     } catch (error) {
         if (error instanceof Error) {
-            return error.message
+            throw error.message
         }
-        return error
+        throw error
 
     }
 

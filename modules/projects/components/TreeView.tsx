@@ -13,9 +13,10 @@ import {
 } from "@/components/ui/sidebar";
 import { ChevronRightIcon, FileIcon, FolderIcon } from "lucide-react";
 import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { TreeProps, TreeViewProps } from "@/types/interface";
 
 
-export const TreeView = ({ data, value, onSelect }) => {
+export const TreeView = ({ data, value, onSelect }: TreeViewProps) => {
   return (
     <SidebarProvider>
       <Sidebar collapsible="none" className="w-full">
@@ -43,8 +44,10 @@ export const TreeView = ({ data, value, onSelect }) => {
 };
 
 
-const Tree = ({ item, selectedValue, onSelect, parentPath }) => {
+const Tree = ({ item, selectedValue, onSelect, parentPath }: TreeProps) => {
   const [name, ...items] = Array.isArray(item) ? item : [item];
+  // const name = Array.isArray(item) ? item[0] : item;
+  // const items = Array.isArray(item) ? item.slice(1) : []
   const currentPath = parentPath ? `${parentPath}/${name}` : name;
 
   if (!items.length) {

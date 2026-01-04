@@ -2,7 +2,6 @@ import {  } from '@/modules/home/action'
 import ProjectForm from '@/modules/home/components/ProjectForm'
 import ProjectList from '@/modules/home/components/ProjectList'
 import Image from 'next/image'
-import React from 'react'
 
 const Page = () => {
   

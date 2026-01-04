@@ -1,5 +1,6 @@
 import type{ Fragment } from "@/lib/generated/prisma/client";
 import type { Prisma } from '@/lib/generated/prisma/client'
+import { TreeItem } from "./type";
 
 export interface Props  {
   children: React.ReactNode;
@@ -29,7 +30,7 @@ export interface MessageContainerProps {
 export interface MessageCardProps {
   content: string;
   role: string;
-  fragment: Fragment;
+  fragment: Fragment | null;
   createdAt: Date | string;
   isActiveFragment: boolean;
   onFragmentClick:() => void;
@@ -38,7 +39,7 @@ export interface MessageCardProps {
 
 export interface AssistantMessageProps {
   content: string;
-  fragment: Fragment;
+  fragment: Fragment | null;
   createdAt: Date | string;
   isActiveFragment: boolean;
   onFragmentClick:() => void;
@@ -52,3 +53,27 @@ export interface FragmentCardProps
   onFragmentClick:(fragment:Fragment) => void;
 }
 
+
+export interface HintProps  {
+  children: React.ReactNode;
+  text: string;
+  side?: "top" | "right" | "bottom" | "left";
+  align?: "start" | "center" | "end";
+  sideOffset?: number;
+};
+
+
+
+export interface TreeViewProps {
+  data: TreeItem[];
+  value: string | null;
+  onSelect: (filePath: string)=> void;
+}
+
+
+export interface TreeProps {
+  item: TreeItem;
+  selectedValue: string | null;
+  onSelect: (filePath: string) => void;
+  parentPath: string;
+}

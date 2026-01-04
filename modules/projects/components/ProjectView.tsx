@@ -16,10 +16,16 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import FragmentWeb from "./FragmentWeb";
 import FileExplorer from "./FileExplorer";
+import { useAuth } from "@clerk/nextjs";
 
 const ProjectView = ({ projectId }: { projectId: string }) => {
   const [activeFragment, setActiveFragment] = useState<Fragment | null>(null)
   const [tabState, setTabState] = useState("preview")
+
+  const { has } = useAuth()
+  
+  const hasProAccess = has?.({ plan: "pro" });
+  
   return (
     <div className="h-screen">
       <ResizablePanelGroup defaultSizes={[300, 800]} className="h-full">
@@ -58,14 +64,17 @@ const ProjectView = ({ projectId }: { projectId: string }) => {
                   <span>Code</span>
                 </TabsTrigger>
               </TabsList>
-              <div className="ml-auto flex items-center gap-x-2">
-                <Button asChild size={"sm"}>
-                  <Link href={"/pricing"} className="flex items-center">
-                    <CrownIcon className="size-4 mr-2" />
-                    Upgrade
-                  </Link>
-                </Button>
-              </div>
+              {
+                 !hasProAccess && (
+                      <div className="ml-auto flex items-center gap-x-2">
+                        <Button asChild size={"sm"}>
+                          <Link href={"/pricing"} className="flex items-center">
+                            <CrownIcon className="size-4 mr-2" />
+                            Upgrade
+                          </Link>
+                        </Button>
+                      </div>)
+              }
             </div>
             <TabsContent 
             value="preview"
