@@ -10,7 +10,7 @@ import { useState } from "react";
 import { Code, CrownIcon, EyeIcon } from "lucide-react";
 import ProjectHeader from "./ProjectHeader";
 import MessageContainer from "./MessageContainer";
-import { Fragment } from "@/lib/generated/prisma/client";
+import { Fragment } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import FragmentWeb from "./FragmentWeb";

@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { Prisma } from "./generated/prisma/client";
+import type { Prisma } from "@prisma/client";
 import { TreeItem, TreeNode } from "@/types/type";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

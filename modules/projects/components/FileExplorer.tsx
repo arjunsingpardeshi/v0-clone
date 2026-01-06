@@ -1,4 +1,4 @@
-import type { Prisma } from '@/lib/generated/prisma/client'
+import type { Prisma } from '@prisma/client'
 import { CopyCheckIcon, CopyIcon } from "lucide-react";
 import { useState, useMemo, useCallback, Fragment, useEffect } from "react";
 import { Button } from "@/components/ui/button";
