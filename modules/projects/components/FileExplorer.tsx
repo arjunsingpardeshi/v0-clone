@@ -20,6 +20,7 @@ import { convertFilesToTreeItems } from '@/lib/utils';
 import { TreeView } from './TreeView';
 import { CodeView } from './code-view';
 import { FileMap } from '@/types/type';
+import { normalizeCode } from '@/utils/helper';
 
 
 
@@ -195,7 +196,7 @@ const FileExplorer = ({ files }: { files: Prisma.JsonValue }) => {
 
             <div className="flex-1 overflow-auto relative">
               <CodeView
-                code={fileMap[selectedFile]}
+                code={normalizeCode(fileMap[selectedFile])}
                 lang={getLanguageFromExtension(selectedFile)}
               />
             </div>

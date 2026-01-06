@@ -6,11 +6,12 @@ import "prismjs/components/prism-python";
 import "prismjs/components/prism-tsx";
 import "prismjs/components/prism-javascript";
 import "./code-theme.css";
+import { FileMap } from "@/types/type";
 
 export const CodeView = ({
   code,
   lang = "javascript", // default to javascript if no language specified
-}) => {
+}: {code: string, lang: string}) => {
   useEffect(() => {
     if (code && lang) {
       Prism.highlightAll();

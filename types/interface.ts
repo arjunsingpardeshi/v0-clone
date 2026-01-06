@@ -1,5 +1,4 @@
 import type{ Fragment } from "@/lib/generated/prisma/client";
-import type { Prisma } from '@/lib/generated/prisma/client'
 import { TreeItem } from "./type";
 
 export interface Props  {

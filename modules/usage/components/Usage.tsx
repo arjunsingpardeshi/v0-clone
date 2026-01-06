@@ -4,7 +4,6 @@ import { formatDuration, intervalToDuration } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useStatus } from "../hooks/usage";
 import { useAuth } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
 import { Spinner } from "@/components/ui/spinner";
 
 export const Usage = () => {

@@ -4,7 +4,6 @@ import { useTheme } from "next-themes";
 import {
     ChevronDownIcon,
     ChevronLeftIcon,
-    EditIcon,
     SunMoonIcon,
 } from "lucide-react";
 
@@ -41,7 +40,7 @@ const ProjectHeader = ({ projectId }: { projectId: string }) => {
                         variant={"ghost"}
                         size={"sm"}
                         className={
-                            "focus-visible:ring-0 hover:bg-transparent hover:opacity-75 transition-opacity !pl-2"
+                            "focus-visible:ring-0 hover:bg-transparent hover:opacity-75 transition-opacity !pl-2!"
                         }
                     >
                         <Image

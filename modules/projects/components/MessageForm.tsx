@@ -3,7 +3,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TextAreaAutosize from "react-textarea-autosize";
 import { ArrowUpIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
 import z from "zod";

@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/resizable";
 import { useState } from "react";
 import { Code, CrownIcon, EyeIcon } from "lucide-react";
-import { minSize } from "zod";
 import ProjectHeader from "./ProjectHeader";
 import MessageContainer from "./MessageContainer";
 import { Fragment } from "@/lib/generated/prisma/client";
