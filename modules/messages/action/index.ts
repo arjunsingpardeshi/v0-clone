@@ -1,6 +1,6 @@
 "use server"
 
-import { MessageRole, MessageType } from "@/lib/generated/prisma/enums";
+import { MessageRole, MessageType } from "@prisma/client";
 
 import db from "@/lib/db";
 import { inngest } from "@/inngest/client";

@@ -2,7 +2,7 @@
 
 import { inngest } from "@/inngest/client"
 import db from "@/lib/db"
-import { MessageRole, MessageType } from "@/lib/generated/prisma/client"
+import { MessageRole, MessageType } from "@prisma/client"
 import { consumeCredits } from "@/lib/usage"
 import { getCurrentUser } from "@/modules/auth/actions"
 import { generateSlug } from "random-word-slugs"

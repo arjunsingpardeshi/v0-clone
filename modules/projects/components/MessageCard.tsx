@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card';
-import { MessageRole, MessageType } from '@/lib/generated/prisma/enums';
+import { MessageRole, MessageType } from '@prisma/client';
 import { cn } from '@/lib/utils';
 import { AssistantMessageProps, FragmentCardProps, MessageCardProps } from '@/types/interface'
 import Image from 'next/image';

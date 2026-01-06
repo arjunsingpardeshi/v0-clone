@@ -7,7 +7,7 @@ import React, { useEffect, useRef } from "react";
 import { useQueryClient } from '@tanstack/react-query';
 import { Spinner } from '@/components/ui/spinner';
 import MessageCard from './MessageCard';
-import { MessageRole } from '@/lib/generated/prisma/enums';
+import { MessageRole } from '@prisma/client';
 import MessageForm from './MessageForm';
 import MessageLoading from './MessageLoading';
 
