@@ -13,7 +13,7 @@ export async function createProject(value: string) {
         const user = await getCurrentUser();
 
         if (!user) {
-            throw new Error("Unauthorized");
+            throw new Error("You need to be signed in to create a project.");
         }
 
         try {

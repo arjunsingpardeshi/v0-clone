@@ -99,7 +99,9 @@ const ProjectForm = () => {
         if(error instanceof Error){
           toast.error(error.message || "Failed to create project")
         }
-        toast.error("Failed to create project")
+        else{
+          toast.error("Failed to create project")
+        }
     }
   }
   function shuffle<T>(array: T[]) {
@@ -121,7 +123,7 @@ const isButtonDisabled = isPending || !form.watch("content").trim()
           <button
             key={index}
             onClick={() => handleTemplate(template.prompt)}
-            // disabled={isPending}
+            disabled={isPending}
             className="group relative p-4 rounded-xl border bg-card hover:bg-accent/50 transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md hover:border-primary/30"
           >
             <div className="flex flex-col gap-2">
@@ -162,7 +164,7 @@ const isButtonDisabled = isPending || !form.watch("content").trim()
             render={({ field }) => (
               <TextAreaAutosize
                 {...field}
-                //disabled={isPending}
+                disabled={isPending}
                 placeholder="Describe what you want to create..."
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
@@ -170,7 +172,7 @@ const isButtonDisabled = isPending || !form.watch("content").trim()
                 maxRows={8}
                 className={cn(
                   "pt-4 resize-none border-none w-full outline-none bg-transparent",
-                //  isPending && "opacity-50"
+                  isPending && "opacity-50"
                 )}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
