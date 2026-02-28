@@ -13,7 +13,10 @@ export async function createProject(value: string) {
         const user = await getCurrentUser();
 
         if (!user) {
-            throw new Error("You need to be signed in to create a project.");
+            return {
+                success: false,
+                message: "UNAUTHORIZED"
+            }
         }
 
         try {
@@ -21,7 +24,7 @@ export async function createProject(value: string) {
             await consumeCredits();
         } catch (error) {
             if (error instanceof Error) {
-                throw new Error("Somthing went wrong", {
+                throw new Error("Something went wrong", {
                     cause: { code: "BAD_REQUEST" }
                 })
             }
@@ -54,13 +57,23 @@ export async function createProject(value: string) {
                 projectId: newProject.id
             }
         })
-        return newProject;
+        return {
+            success: true,
+            data:newProject,
+            message: "Project created sucessfully"
+        };
 
     } catch (error) {
-        if (error instanceof Error) {
-            throw error.message
+        if(error instanceof Error){
+            return {
+            success: false,
+            message: error.message
         }
-        throw error
+        }
+        return {
+            success: false,
+            message: "Failed to create project."
+        }
     }
 }
 

@@ -92,9 +92,19 @@ const ProjectForm = () => {
   const onSubmit: SubmitHandler<{ content: string }> = async(values) => {
     try {
         const res = await mutateAsync(values.content)
-        router.push(`/projects/${res.id}`)
-        toast.success("Project created successfully")
-        form.reset()
+        if(!res.success){
+          toast.error(res.message === "UNAUTHORIZED" 
+          ? "You need to sign in to create a project."
+          : res.message 
+          );
+          return;
+        }
+        else{
+          router.push(`/projects/${res.data?.id}`)
+          toast.success("Project created successfully")
+          form.reset()
+        }
+        
     } catch (error) {
         if(error instanceof Error){
           toast.error(error.message || "Failed to create project")
@@ -113,8 +123,8 @@ const ProjectForm = () => {
   return result;
 }
 
-
-const isButtonDisabled = isPending || !form.watch("content").trim()
+const content = form.watch("content")
+const isButtonDisabled = isPending || !content.trim()
   return (
     <div className="space-y-8">
         {/* Templates Grid */}
